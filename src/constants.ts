@@ -8,7 +8,7 @@ export const TETRONIMO_Q: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "Q",
-  color: BlockColors.CYAN,
+  color: BlockColors.YELLOW,
 };
 
 export const TETRONIMO_Z: Tetromino = {
@@ -19,7 +19,7 @@ export const TETRONIMO_Z: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "Z",
-  color: BlockColors.BLUE,
+  color: BlockColors.RED,
 };
 
 export const TETRONIMO_S: Tetromino = {
@@ -30,7 +30,7 @@ export const TETRONIMO_S: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "S",
-  color: BlockColors.ORANGE,
+  color: BlockColors.GREEN,
 };
 
 export const TETRONIMO_T: Tetromino = {
@@ -41,7 +41,7 @@ export const TETRONIMO_T: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "T",
-  color: BlockColors.YELLOW,
+  color: BlockColors.PURPLE,
 };
 
 export const TETRONIMO_I: Tetromino = {
@@ -52,7 +52,7 @@ export const TETRONIMO_I: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "I",
-  color: BlockColors.GREEN,
+  color: BlockColors.CYAN,
 };
 
 export const TETRONIMO_L: Tetromino = {
@@ -63,7 +63,7 @@ export const TETRONIMO_L: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "L",
-  color: BlockColors.PURPLE,
+  color: BlockColors.ORANGE,
 };
 
 export const TETRONIMO_J: Tetromino = {
@@ -74,7 +74,7 @@ export const TETRONIMO_J: Tetromino = {
     [0, 0, 0, 0],
   ],
   name: "J",
-  color: BlockColors.RED,
+  color: BlockColors.BLUE,
 };
 
 export const TETRONIMOS = [
