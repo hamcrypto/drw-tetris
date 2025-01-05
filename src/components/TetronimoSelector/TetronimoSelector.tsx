@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { TETRONIMOS } from "../../constants";
 import { Tetromino } from "../../types";
 import { gridBuilder } from "../../utils";
@@ -26,15 +26,21 @@ function TetronimoPieceHolder({
       }}
       onClick={() => setActiveTetronimo(isSelected ? null : tetronimo)}
     >
+      <label>{tetronimo.name}</label>
       <GridDisplay gridState={gridState} />
     </div>
   );
 }
 
-function TetronimoSelector() {
-  const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
-    null
-  );
+interface TetronimoSelectorProps {
+  activeTetronimo: Tetromino | null;
+  setActiveTetronimo: Dispatch<SetStateAction<Tetromino | null>>;
+}
+
+function TetronimoSelector({
+  activeTetronimo,
+  setActiveTetronimo,
+}: TetronimoSelectorProps) {
   return (
     <div
       style={{

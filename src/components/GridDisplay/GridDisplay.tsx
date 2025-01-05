@@ -15,6 +15,7 @@ export interface GridOptions {
 interface GridDisplayProps {
   gridState: Block[][];
   gridOptions?: GridOptions;
+  style?: React.CSSProperties;
 }
 
 interface GridBlockProps {
@@ -45,10 +46,14 @@ const GridBlock = ({ block, blockOptions }: GridBlockProps) => {
     ></td>
   );
 };
-function GridDisplay({ gridState = [], gridOptions = {} }: GridDisplayProps) {
+function GridDisplay({
+  gridState = [],
+  gridOptions = {},
+  style,
+}: GridDisplayProps) {
   const { onClick, onMouseOver } = gridOptions;
   return (
-    <table onMouseOver={onMouseOver} onClick={onClick}>
+    <table onMouseOver={onMouseOver} onClick={onClick} style={style}>
       <tbody>
         {gridState.map((arrayColumn, rowIndex) => (
           <tr key={rowIndex}>
