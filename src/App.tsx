@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       <h1>React Tetris Engine</h1>
-      <GridDisplay width={10} height={10} />
+      <GridDisplay columnCount={10} rowCount={20} />
     </>
   );
 }

@@ -11,6 +11,6 @@ export type BlockColors =
 export interface Block {
   color: BlockColors;
   filled: boolean;
-  xcord: number;
-  ycord: number;
+  xCord: number;
+  yCord: number;
 }
