@@ -1,16 +1,25 @@
-export type BlockColors =
-  | "Cyan"
-  | "Blue"
-  | "Orange"
-  | "Yellow"
-  | "Green"
-  | "Purple"
-  | "Red"
-  | "White";
+export const BlockColors = {
+  CYAN: "Cyan",
+  BLUE: "Blue",
+  ORANGE: "Orange",
+  YELLOW: "Yellow",
+  GREEN: "Green",
+  PURPLE: "Purple",
+  RED: "Red",
+  WHITE: "White",
+} as const;
+
+export type BlockColors = (typeof BlockColors)[keyof typeof BlockColors];
 
 export interface Block {
   color: BlockColors;
   filled: boolean;
   xCord: number;
   yCord: number;
+}
+
+export interface Tetromino {
+  coordinates: (0 | 1)[][];
+  color: BlockColors;
+  name: string;
 }
