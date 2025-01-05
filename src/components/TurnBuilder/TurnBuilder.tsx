@@ -1,13 +1,17 @@
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import TetronimoSelector from "../TetronimoSelector/TetronimoSelector";
-import { Block, Tetromino } from "../../types";
+import { Block, Tetromino, Turn, TurnsList } from "../../types";
 import GridDisplay from "../GridDisplay/GridDisplay";
-import { gridBuilder, mergeBlockArrays } from "../../utils";
+import {
+  convertTurnToString,
+  gridBuilder,
+  mergeBlockArrays,
+} from "../../utils";
 import { TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT } from "../../constants";
 
 interface TurnBuilderProps {
-  turnsList: string[];
-  setTurnsList: Dispatch<SetStateAction<string[]>>;
+  turnsList: TurnsList;
+  setTurnsList: Dispatch<SetStateAction<TurnsList>>;
 }
 
 const INITIAL_GRID = gridBuilder(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
@@ -16,12 +20,12 @@ function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
   const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
     null
   );
-  const [turnInput, setTurnInput] = useState<string>("");
+  const [turnInput, setTurnInput] = useState<Turn[]>([]);
   function submitTurnAdditionForm(event: FormEvent) {
     event.preventDefault();
     if (turnInput) {
       setTurnsList((prevTurns) => [...prevTurns, turnInput]);
-      setTurnInput("");
+      setTurnInput([]);
     }
   }
 
@@ -70,12 +74,10 @@ function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
             },
             onClick: (_event, block) => {
               if (activeTetronimo)
-                setTurnInput(
-                  (prevInput) =>
-                    `${prevInput ? prevInput + "," : ""}${
-                      activeTetronimo.name
-                    }${block.xCord}`
-                );
+                setTurnInput((prevInput) => [
+                  ...prevInput,
+                  { tetronimo: activeTetronimo, colOffset: block.xCord },
+                ]);
               setActiveTetronimo(null);
               setTurnSelectorGridPreview(INITIAL_GRID);
             },
@@ -91,7 +93,7 @@ function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
           name="turnInput"
           placeholder={"e.g. T1,Z3,I4"}
           style={{ width: "100%", fontSize: 20 }}
-          value={turnInput}
+          value={convertTurnToString(turnInput)}
         />
         <button onClick={submitTurnAdditionForm} disabled={!turnInput.length}>
           Add turn

@@ -1,5 +1,8 @@
+import { TurnsList } from "../../types";
+import { convertTurnToString } from "../../utils";
+
 interface TurnsListTableProps {
-  turnsList: string[];
+  turnsList: TurnsList;
 }
 
 function TurnsListTable({ turnsList }: TurnsListTableProps) {
@@ -11,6 +14,7 @@ function TurnsListTable({ turnsList }: TurnsListTableProps) {
         <tr>
           <th>Number</th>
           <th>Turn Play</th>
+          <th>Result</th>
         </tr>
       </thead>
       <tbody>
@@ -24,7 +28,8 @@ function TurnsListTable({ turnsList }: TurnsListTableProps) {
         {turnsList.map((currentTurn, count) => (
           <tr>
             <td>{count}</td>
-            <td>{currentTurn}</td>
+            <td>{convertTurnToString(currentTurn)}</td>
+            <td>Pending</td>
           </tr>
         ))}
       </tbody>

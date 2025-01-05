@@ -1,4 +1,4 @@
-import { Block, BlockColors, Tetromino } from "./types";
+import { Block, BlockColors, Tetromino, Turn } from "./types";
 
 const blockBuilder = ({
   color = "White" as BlockColors,
@@ -143,3 +143,10 @@ export const throttle = <R, A extends unknown[]>(
     },
   ];
 };
+
+export const convertTurnToString = (turns: Turn[]) =>
+  turns
+    .map(
+      (currentTurn) => `${currentTurn.tetronimo.name}${currentTurn.colOffset}`
+    )
+    .join(",");

@@ -23,3 +23,10 @@ export interface Tetromino {
   color: BlockColors;
   name: string;
 }
+
+export interface Turn {
+  tetronimo: Tetromino;
+  colOffset: number;
+}
+
+export type TurnsList = Turn[][];
