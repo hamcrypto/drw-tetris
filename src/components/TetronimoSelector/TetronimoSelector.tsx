@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction } from "react";
-import { TETRONIMOS } from "../../constants";
+import {
+  TETRONIMO_COL_COUNT,
+  TETRONIMO_ROW_COUNT,
+  TETRONIMOS,
+} from "../../constants";
 import { Tetromino } from "../../types";
 import { gridBuilder } from "../../utils";
 import GridDisplay from "../GridDisplay/GridDisplay";
@@ -15,7 +19,11 @@ function TetronimoPieceHolder({
   setActiveTetronimo,
   isSelected,
 }: TetronimoPieceHolderProps) {
-  const gridState = gridBuilder(4, 4, tetronimo);
+  const gridState = gridBuilder(
+    TETRONIMO_ROW_COUNT,
+    TETRONIMO_COL_COUNT,
+    tetronimo
+  );
 
   return (
     <div

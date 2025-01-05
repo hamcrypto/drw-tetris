@@ -1,5 +1,12 @@
 import { BlockColors, Tetromino } from "./types";
 
+export const TETRONIMO_ROW_COUNT = 4;
+export const TETRONIMO_COL_COUNT = 4;
+
+export const TETRIS_COL_COUNT = 10;
+
+export const TETRIS_ROW_COUNT = 20;
+
 export const TETRONIMO_Q: Tetromino = {
   coordinates: [
     [1, 1, 0, 0],

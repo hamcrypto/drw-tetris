@@ -1,6 +1,9 @@
-import { FormEvent, useState } from "react";
+import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import TetronimoSelector from "../TetronimoSelector/TetronimoSelector";
-import { Tetromino } from "../../types";
+import { Block, Tetromino } from "../../types";
+import GridDisplay from "../GridDisplay/GridDisplay";
+import { gridBuilder, mergeBlockArrays } from "../../utils";
+import { TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT } from "../../constants";
 
 interface TurnsListTableProps {
   turnsList: string[];
@@ -18,6 +21,13 @@ function TurnsListTable({ turnsList }: TurnsListTableProps) {
         </tr>
       </thead>
       <tbody>
+        {!turnsList.length && (
+          <tr>
+            <td colSpan={2} style={{ textAlign: "center" }}>
+              No turns have been added
+            </td>
+          </tr>
+        )}
         {turnsList.map((currentTurn, count) => (
           <tr>
             <td>{count}</td>
@@ -29,11 +39,17 @@ function TurnsListTable({ turnsList }: TurnsListTableProps) {
   );
 }
 
-function TurnBuilder() {
+interface TurnBuilderProps {
+  turnsList: string[];
+  setTurnsList: Dispatch<SetStateAction<string[]>>;
+}
+
+const INITIAL_GRID = gridBuilder(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
+
+function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
   const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
     null
   );
-  const [turnsList, setTurnsList] = useState<string[]>([]);
   const [turnInput, setTurnInput] = useState<string>("");
   function submitTurnAdditionForm(event: FormEvent) {
     event.preventDefault();
@@ -42,6 +58,33 @@ function TurnBuilder() {
       setTurnInput("");
     }
   }
+
+  function resetTurnsList() {
+    setTurnsList([]);
+  }
+
+  const [turnSelectorGridPreview, setTurnSelectorGridPreview] =
+    useState<Block[][]>(INITIAL_GRID);
+
+  const positionNewTetronimo = (tetronimo: Tetromino, xCord: number) => {
+    const tetronimoConvertedToGrid = gridBuilder(
+      TETRONIMO_ROW_COUNT,
+      TETRONIMO_ROW_COUNT,
+      tetronimo
+    );
+
+    const updatedGrid = mergeBlockArrays(
+      INITIAL_GRID,
+      tetronimoConvertedToGrid,
+      { colOffset: xCord, rowOffset: 0 }
+    );
+
+    if (updatedGrid !== false) {
+      setTurnSelectorGridPreview(updatedGrid);
+    }
+    return updatedGrid;
+  };
+
   return (
     <div>
       <h3>Turn builder</h3>
@@ -51,17 +94,44 @@ function TurnBuilder() {
           setActiveTetronimo={setActiveTetronimo}
         />
       </div>
+      <GridDisplay
+        gridState={turnSelectorGridPreview}
+        gridOptions={{
+          blockOptions: {
+            onMouseOver: (_event, block) => {
+              if (activeTetronimo)
+                positionNewTetronimo(activeTetronimo, block.xCord);
+            },
+            onClick: (_event, block) => {
+              if (activeTetronimo)
+                setTurnInput(
+                  (prevInput) =>
+                    `${prevInput ? prevInput + "," : ""}${
+                      activeTetronimo.name
+                    }${block.xCord}`
+                );
+              setActiveTetronimo(null);
+              setTurnSelectorGridPreview(INITIAL_GRID);
+            },
+          },
+        }}
+        style={{ cursor: "pointer" }}
+      />
+
       <form>
         <input
           type="text"
+          disabled
           name="turnInput"
           placeholder={"e.g. T1,Z3,I4"}
-          style={{ width: "100%" }}
+          style={{ width: "100%", fontSize: 20 }}
           value={turnInput}
-          onChange={(event) => setTurnInput(event.target.value)}
         />
         <button onClick={submitTurnAdditionForm} disabled={!turnInput.length}>
           Add turn
+        </button>
+        <button onClick={resetTurnsList} disabled={!turnsList.length}>
+          Reset turns list
         </button>
       </form>
 
