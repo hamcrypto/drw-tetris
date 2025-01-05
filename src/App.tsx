@@ -17,6 +17,7 @@ TODONOW
   - Remaining fixes: 
     - (SHOULD BE DONE) Get it to add height when it is too big already (Should add 4 rows if height is in doubt)
     - Get the text input to work manually
+      - Do as a radio button initially
     - Hook up the turns: 
       - Get the turns to actually populate the results grid (Should give the height as well as the grid itself saved)
       - Add state so that when the results grid is clicked it updates the visualizer
@@ -24,6 +25,7 @@ TODONOW
       - Write some unit tests
     - Write the Readme
     - Tidy up code
+    - UX improvements
   
   - Improvements:
     - Not responsive 
