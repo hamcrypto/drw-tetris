@@ -5,40 +5,6 @@ import GridDisplay from "../GridDisplay/GridDisplay";
 import { gridBuilder, mergeBlockArrays } from "../../utils";
 import { TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT } from "../../constants";
 
-interface TurnsListTableProps {
-  turnsList: string[];
-}
-
-function TurnsListTable({ turnsList }: TurnsListTableProps) {
-  return (
-    <table
-      style={{ width: "100%", textAlign: "left", border: "1px solid black" }}
-    >
-      <thead>
-        <tr>
-          <th>Count</th>
-          <th>Turn Play</th>
-        </tr>
-      </thead>
-      <tbody>
-        {!turnsList.length && (
-          <tr>
-            <td colSpan={2} style={{ textAlign: "center" }}>
-              No turns have been added
-            </td>
-          </tr>
-        )}
-        {turnsList.map((currentTurn, count) => (
-          <tr>
-            <td>{count}</td>
-            <td>{currentTurn}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
 interface TurnBuilderProps {
   turnsList: string[];
   setTurnsList: Dispatch<SetStateAction<string[]>>;
@@ -134,8 +100,6 @@ function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
           Reset turns list
         </button>
       </form>
-
-      <TurnsListTable turnsList={turnsList} />
     </div>
   );
 }
