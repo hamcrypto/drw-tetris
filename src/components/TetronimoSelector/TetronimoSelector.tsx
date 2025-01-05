@@ -1,5 +1,6 @@
 import { TETRONIMOS } from "../../constants";
 import { Tetromino } from "../../types";
+import { gridBuilder } from "../../utils";
 import GridDisplay from "../GridDisplay/GridDisplay";
 
 interface TetronimoPieceHolderProps {
@@ -7,13 +8,14 @@ interface TetronimoPieceHolderProps {
 }
 
 function TetronimoPieceHolder({ tetronimo }: TetronimoPieceHolderProps) {
+  const gridState = gridBuilder(4, 4, tetronimo);
   return (
     <div
       style={{
         margin: "2px",
       }}
     >
-      <GridDisplay rowCount={4} columnCount={4} />
+      <GridDisplay gridState={gridState} />
     </div>
   );
 }
