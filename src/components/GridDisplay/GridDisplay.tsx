@@ -53,7 +53,12 @@ function GridDisplay({
 }: GridDisplayProps) {
   const { onClick, onMouseOver } = gridOptions;
   return (
-    <table onMouseOver={onMouseOver} onClick={onClick} style={style}>
+    <table
+      onMouseOver={onMouseOver}
+      onClick={onClick}
+      style={style}
+      className="grid-display"
+    >
       <tbody>
         {gridState.map((arrayColumn, rowIndex) => (
           <tr key={rowIndex}>
