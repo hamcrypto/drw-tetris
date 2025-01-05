@@ -11,6 +11,7 @@ export const BlockColors = {
 
 export type BlockColors = (typeof BlockColors)[keyof typeof BlockColors];
 
+export type Grid = Block[][];
 export interface Block {
   color: BlockColors;
   filled: boolean;

@@ -1,13 +1,17 @@
 import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import TetronimoSelector from "../TetronimoSelector/TetronimoSelector";
-import { Block, Tetromino, Turn, TurnsList } from "../../types";
+import { Grid, Tetromino, Turn, TurnsList } from "../../types";
 import GridDisplay from "../GridDisplay/GridDisplay";
 import {
   convertTurnToString,
   gridBuilder,
   mergeBlockArrays,
 } from "../../utils";
-import { TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT } from "../../constants";
+import {
+  TETRIS_COL_COUNT,
+  TETRONIMO_COL_COUNT,
+  TETRONIMO_ROW_COUNT,
+} from "../../constants";
 
 interface TurnBuilderProps {
   turnsList: TurnsList;
@@ -34,12 +38,12 @@ function TurnBuilder({ turnsList, setTurnsList }: TurnBuilderProps) {
   }
 
   const [turnSelectorGridPreview, setTurnSelectorGridPreview] =
-    useState<Block[][]>(INITIAL_GRID);
+    useState<Grid>(INITIAL_GRID);
 
   const positionNewTetronimo = (tetronimo: Tetromino, xCord: number) => {
     const tetronimoConvertedToGrid = gridBuilder(
       TETRONIMO_ROW_COUNT,
-      TETRONIMO_ROW_COUNT,
+      TETRONIMO_COL_COUNT,
       tetronimo
     );
 

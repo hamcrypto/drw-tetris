@@ -1,4 +1,4 @@
-import { Block } from "../../types";
+import { Block, Grid } from "../../types";
 import "./styles.css";
 
 interface BlockOptions {
@@ -13,7 +13,7 @@ export interface GridOptions {
 }
 
 interface GridDisplayProps {
-  gridState: Block[][];
+  gridState: Grid;
   gridOptions?: GridOptions;
   style?: React.CSSProperties;
 }
