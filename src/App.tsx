@@ -5,13 +5,12 @@ import { gridBuilder } from "./utils";
 
 function App() {
   const initialArray = gridBuilder(10, 20);
-
   return (
     <>
       <h1>React Tetris Engine</h1>
       <div style={{ display: "flex" }}>
         <TetronimoSelector />
-        <GridDisplay gridState={initialArray} />
+        {/* <GridDisplay gridState={initialArray} /> */}
       </div>
     </>
   );
