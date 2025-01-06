@@ -45,7 +45,7 @@
 
 # Reflecting on this task
 
-- Overall I am happy with the functionality offered by the application I built, but quite disatisfied with the overall code quality
+- Overall I am happy with the functionality offered by the application I built, but disatisfied with the overall code quality, which I don't believe was a good reflection of the quality I output on a day to day basis, with more time I woul have performed a lot of refactoring, and I'm happy to run through the specific issues I would address, with some of these highlighted above
 
 # Concepts
 
