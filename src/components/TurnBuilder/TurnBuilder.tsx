@@ -17,36 +17,34 @@ interface TurnBuilderProps {
 
 const INITIAL_GRID = createGrid(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
 
+type turnBuilderInputTypes = "builder" | "text";
+
 function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
   const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
     null
   );
   const [turnInput, setTurnInput] = useState<Turn[]>([]);
   const [freeTextInput, setFreeTextInput] = useState<string>("");
-  const [selectedInputType, setSelectedInputType] = useState<
-    "builder" | "text"
-  >("text");
+  const [selectedInputType, setSelectedInputType] =
+    useState<turnBuilderInputTypes>("builder");
   const [turnSelectorGridPreview, setTurnSelectorGridPreview] =
     useState<Grid>(INITIAL_GRID);
 
+  const handleSelectedInputTypeChange = (newType: turnBuilderInputTypes) => {
+    setSelectedInputType(newType);
+    setTurnInput([]);
+    setFreeTextInput("");
+  };
   return (
     <div>
       <h3>Turn builder</h3>
-      <TetronimoSelector
-        activeTetronimo={activeTetronimo}
-        setActiveTetronimo={setActiveTetronimo}
-      />
       <div>
         <label>
           <input
             type="radio"
             value="builder"
             checked={selectedInputType === "builder"}
-            onChange={() => {
-              setSelectedInputType("builder");
-              setTurnInput([]);
-              setFreeTextInput("");
-            }}
+            onChange={() => handleSelectedInputTypeChange("builder")}
           />
           Builder Input
         </label>
@@ -55,17 +53,12 @@ function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
             type="radio"
             value="text"
             checked={selectedInputType === "text"}
-            onChange={() => {
-              setSelectedInputType("text");
-              setTurnInput([]);
-              setFreeTextInput("");
-            }}
+            onChange={() => handleSelectedInputTypeChange("text")}
           />
           Text Input
         </label>
       </div>
 
-      {/* Input Form */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -76,9 +69,12 @@ function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
           }
         }}
       >
-        {/* Builder Input */}
         {selectedInputType === "builder" && (
           <>
+            <TetronimoSelector
+              activeTetronimo={activeTetronimo}
+              setActiveTetronimo={setActiveTetronimo}
+            />
             <GridDisplay
               gridState={turnSelectorGridPreview}
               gridOptions={{
