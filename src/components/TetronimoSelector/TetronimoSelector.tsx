@@ -7,7 +7,7 @@ import {
 import { Tetromino } from "../../types";
 import { createGrid } from "../../utils";
 import GridDisplay from "../GridDisplay/GridDisplay";
-
+import "./styles.css";
 interface TetronimoPieceHolderProps {
   tetronimo: Tetromino;
   setActiveTetronimo: Dispatch<SetStateAction<Tetromino | null>>;
@@ -50,19 +50,7 @@ function TetronimoSelector({
   setActiveTetronimo,
 }: TetronimoSelectorProps) {
   return (
-    <div
-      style={{
-        height: "600px",
-        width: "358px",
-        overflowY: "scroll",
-        border: "1px solid black",
-        display: "flex",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        alignContent: "flex-start",
-        justifyContent: "flex-start",
-      }}
-    >
+    <div className="tetronimo-selector">
       {TETRONIMOS.map((currentTetronimo) => (
         <TetronimoPieceHolder
           tetronimo={currentTetronimo}

@@ -8,21 +8,17 @@ import {
   TETRONIMOS,
 } from "../../constants";
 
-// Helper function to handle turn submission
 export const handleSubmitTurn = (
   turnInput: Turn[],
   setTurnsList: Dispatch<SetStateAction<TurnsList>>,
   setTurnInput: Dispatch<SetStateAction<Turn[]>>
 ) => {
-  if (turnInput.length > 0) {
-    const newTurn: TurnsListItem = { turns: turnInput };
-    setTurnsList((prevTurns) => [...prevTurns, newTurn]);
-    setTurnInput([]);
-  }
+  const newTurn: TurnsListItem = { turns: turnInput };
+  setTurnsList((prevTurns) => [...prevTurns, newTurn]);
+  setTurnInput([]);
 };
 
-// Helper function to validate free text input
-export const isFreeTextValid = (text: string) => {
+export const validateFreeText = (text: string) => {
   const splitInput = text.split(",");
   const availableTetronimoNames = TETRONIMOS.map((curr) => curr.name);
 
@@ -36,7 +32,6 @@ export const isFreeTextValid = (text: string) => {
   });
 };
 
-// Helper function to process free text input and add turn
 export const processFreeText = (
   freeTextInput: string,
   setTurnsList: Dispatch<SetStateAction<TurnsList>>
@@ -61,7 +56,6 @@ export const processFreeText = (
   setTurnsList((prevTurns) => [...prevTurns, turnToAdd]);
 };
 
-// Helper function to position a new tetronimo on the grid preview
 export const positionTetronimoOnGrid = (
   tetronimo: Tetromino,
   xCord: number,

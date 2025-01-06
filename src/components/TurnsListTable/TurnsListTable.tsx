@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Grid, TurnsList } from "../../types";
 import { convertTurnToString } from "../../utils";
-
+import "./styles.css";
 interface TurnsListTableProps {
   turnsList: TurnsList;
   setPreviewGrid: Dispatch<SetStateAction<Grid>>;
@@ -21,9 +21,7 @@ function TurnsListTable({
 
   return (
     <div>
-      <table
-        style={{ width: "100%", textAlign: "left", border: "1px solid black" }}
-      >
+      <table className="turns-list-table">
         <thead>
           <tr>
             <th>Number</th>

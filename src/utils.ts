@@ -1,3 +1,4 @@
+import { TETRIS_COL_COUNT } from "./constants";
 import { Block, BlockColors, Grid, Tetromino, Turn } from "./types";
 
 // Helper function to create a block
@@ -6,14 +7,8 @@ const createBlock = ({
   filled = false,
   xCord = 0,
   yCord = 0,
-}: {
-  color?: BlockColors;
-  filled?: boolean;
-  xCord?: number;
-  yCord?: number;
 }): Block => ({ color, filled, xCord, yCord });
 
-// Function to create a grid
 export const createGrid = (
   columnCount: number,
   rowCount: number,
@@ -44,68 +39,69 @@ interface Offset {
   colOffset: number;
 }
 
-// Function to merge two grids
+const copyBlocks = (
+  sourceGrid: Grid,
+  mergedGrid: Grid,
+  maxRows: number,
+  maxCols: number,
+  offset?: Offset
+) => {
+  for (let row = 0; row < sourceGrid.length; row++) {
+    for (let col = 0; col < sourceGrid[row].length; col++) {
+      const sourceBlock = sourceGrid[row][col];
+
+      const targetRow = offset ? row + offset.rowOffset : row;
+      const targetCol = offset ? col + offset.colOffset : col;
+
+      if (
+        targetRow >= 0 &&
+        targetRow < maxRows &&
+        targetCol >= 0 &&
+        targetCol < maxCols
+      ) {
+        const targetBlock = mergedGrid[targetRow][targetCol];
+
+        if (sourceBlock.filled) {
+          if (targetBlock.filled) {
+            return false; // Collision detected
+          } else {
+            targetBlock.filled = true;
+            targetBlock.color = sourceBlock.color;
+          }
+        }
+      } else if (sourceBlock.filled) {
+        return false; // Block goes out of bounds
+      }
+    }
+  }
+  return mergedGrid;
+};
+
 export function mergeGrids(
   grid1: Grid,
   grid2: Grid,
   offset?: Offset
 ): Grid | false {
-  const MAX_GRID_WIDTH = 10;
-
   const maxRows = Math.max(
     grid1.length,
     grid2.length + (offset ? offset.rowOffset : 0)
   );
-  const maxCols = MAX_GRID_WIDTH;
-
+  const maxCols = TETRIS_COL_COUNT;
   const mergedGrid: Grid = createEmptyGrid(maxRows, maxCols);
 
-  // Helper function to copy blocks from a source grid to the merged grid
-  const copyBlocks = (sourceGrid: Grid, isGrid2: boolean = false) => {
-    for (let row = 0; row < sourceGrid.length; row++) {
-      for (let col = 0; col < sourceGrid[row].length; col++) {
-        const sourceBlock = sourceGrid[row][col];
-
-        const targetRow = isGrid2 && offset ? row + offset.rowOffset : row;
-        const targetCol = isGrid2 && offset ? col + offset.colOffset : col;
-
-        if (
-          targetRow >= 0 &&
-          targetRow < maxRows &&
-          targetCol >= 0 &&
-          targetCol < maxCols
-        ) {
-          const targetBlock = mergedGrid[targetRow][targetCol];
-
-          if (sourceBlock.filled) {
-            if (targetBlock.filled) {
-              return false; // Collision detected
-            } else {
-              targetBlock.filled = true;
-              targetBlock.color = sourceBlock.color;
-            }
-          }
-        } else if (sourceBlock.filled) {
-          return false; // Block goes out of bounds
-        }
-      }
-    }
-    return true;
-  };
-
-  // Copy blocks from both grids
-  if (!copyBlocks(grid1) || !copyBlocks(grid2, true)) {
+  if (
+    !copyBlocks(grid1, mergedGrid, maxRows, maxCols) ||
+    !copyBlocks(grid2, mergedGrid, maxRows, maxCols, offset)
+  ) {
     return false; // Error during merging
   }
 
   return mergedGrid;
 }
 
-// Function to convert an array of turns to a string
 export const convertTurnToString = (turns: Turn[]): string =>
   turns.map((turn) => `${turn.tetronimo.name}${turn.colOffset}`).join(",");
 
-// Function to get the height of filled blocks in a grid
 export const getFilledHeight = (grid: Grid): number => {
   const gridHeight = grid.length;
 
@@ -118,7 +114,6 @@ export const getFilledHeight = (grid: Grid): number => {
   return 0;
 };
 
-// Function to create an empty grid of a given size
 const createEmptyGrid = (rows: number, cols: number): Grid => {
   const grid: Grid = [];
   for (let row = 0; row < rows; row++) {
@@ -130,7 +125,6 @@ const createEmptyGrid = (rows: number, cols: number): Grid => {
   return grid;
 };
 
-// Function to add empty rows to the top of a grid
 export const addEmptyRows = (grid: Grid, numRows: number): Grid => {
   const gridWidth = grid[0].length;
   const newGrid = createEmptyGrid(numRows, gridWidth);
@@ -142,7 +136,6 @@ export const addEmptyRows = (grid: Grid, numRows: number): Grid => {
   return newGrid;
 };
 
-// Helper function to update the y-coordinates of blocks in a grid
 const updateBlockYCoordinates = (grid: Grid) => {
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[row].length; col++) {
@@ -170,8 +163,6 @@ export const dropTetromino = (
 
   // Create a copy of the grid to avoid modifying the original
   newGrid = newGrid.map((row) => row.map((block) => ({ ...block })));
-
-  updateBlockYCoordinates(newGrid);
 
   // Find the lowest possible position to place the tetromino
   const gridHeight = newGrid.length;
