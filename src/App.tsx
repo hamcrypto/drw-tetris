@@ -3,19 +3,12 @@ import "./App.css";
 import GridDisplay from "./components/GridDisplay/GridDisplay";
 import TurnBuilder from "./components/TurnBuilder/TurnBuilder";
 import { dropTetromino, getGridHeight, gridBuilder } from "./utils";
-import { TETRIS_COL_COUNT, TETRIS_ROW_COUNT, TETRONIMO_J } from "./constants";
+import { TETRIS_COL_COUNT, TETRIS_ROW_COUNT } from "./constants";
 import TurnsListTable from "./components/TurnsListTable/TurnsListTable";
-import { TurnsList } from "./types";
+import { TurnsListItem, TurnResult, TurnsList } from "./types";
 /*
 
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-
   - Remaining fixes: 
-    - (SHOULD BE DONE) Get it to add height when it is too big already (Should add 4 rows if height is in doubt)
     - Get the text input to work manually
       - Do as a radio button initially
     - Hook up the turns: 
@@ -31,90 +24,64 @@ TODONOW
     - Not responsive 
     - Performance
 
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-TODONOW
-
-
-
-const playTurn = (turnToPlay: Turn[]) => {
-    let adjustedGrid = [...displayArray];
-    turnToPlay.forEach(({ tetronimo, colOffset }) => {
-      adjustedGrid = dropTetromino(adjustedGrid, tetronimo, colOffset);
-    });
-    const height = getGridHeight(adjustedGrid);
-    return { adjustedGrid, height };
-  };
-
-  const playAllUnplayedTurns = () => {
-    turnsList.forEach((currentTurn, index ) => {
-      const { adjustedGrid, height } = playTurn(currentTurn);
-      setTurnsList(prevTurnsList => {
-        return [...prevTurnsList, ]
-      })
-    });
-  };
-
 
   */
 function App() {
-  const [displayArray, setDisplayArray] = useState(
+  const [previewGrid, setPreviewGrid] = useState(
     gridBuilder(TETRIS_COL_COUNT, TETRIS_ROW_COUNT)
   );
+  const [showPreviewGrid, setShowPreviewGrid] = useState(false);
   const [turnsList, setTurnsList] = useState<TurnsList>([]);
+
+  const playTurn = (turnToPlay: TurnsListItem): TurnResult => {
+    let outputGrid = [...previewGrid];
+    turnToPlay.turns.forEach(({ tetronimo, colOffset }) => {
+      outputGrid = dropTetromino(outputGrid, tetronimo, colOffset);
+    });
+    const blockHeight = getGridHeight(outputGrid);
+    return { outputGrid, blockHeight };
+  };
+
+  const playAllUnplayedTurns = () => {
+    setTurnsList((prevTurnsList) => {
+      const processedTurnsList = prevTurnsList.map((currentTurn) => {
+        if (currentTurn.result) return currentTurn;
+        const result = playTurn(currentTurn);
+        return { ...currentTurn, result };
+      });
+
+      return processedTurnsList;
+    });
+  };
+  function resetTurnsList() {
+    setTurnsList([]);
+    setShowPreviewGrid(false);
+  }
   return (
     <>
       <h1>React Tetris Engine</h1>
       <div style={{ display: "flex", gap: "50px" }}>
-        <TurnBuilder turnsList={turnsList} setTurnsList={setTurnsList} />
+        <TurnBuilder setTurnsList={setTurnsList} />
         <div style={{ width: "100%" }}>
           <h3>Turns list</h3>
-          <TurnsListTable turnsList={turnsList} />
-          <button onClick={() => console.log("log")}>Play all turns</button>
+          <TurnsListTable
+            turnsList={turnsList}
+            setPreviewGrid={setPreviewGrid}
+            setShowPreviewGrid={setShowPreviewGrid}
+          />
+          <div>
+            <button onClick={resetTurnsList} disabled={!turnsList.length}>
+              Reset turns list
+            </button>
+            <button onClick={playAllUnplayedTurns}>Play all turns</button>
+          </div>
         </div>
-        <div style={{ width: "100%" }}>
-          <h3>Result Visualizer</h3>
-          <button
-            onClick={() => {
-              const latestTurn = turnsList.length - 1;
-              const lastTurns = turnsList[latestTurn];
-
-              console.log({ latestTurn, lastTurns, turnsList });
-
-              let adjustedGrid = [...displayArray];
-              lastTurns.forEach(({ tetronimo, colOffset }) => {
-                adjustedGrid = dropTetromino(
-                  adjustedGrid,
-                  tetronimo,
-                  colOffset
-                );
-              });
-              setDisplayArray(adjustedGrid);
-            }}
-          >
-            Play latest turn
-          </button>
-          <button
-            onClick={() => {
-              console.log("THE GRID HEIGHT IS ", getGridHeight(displayArray));
-            }}
-          >
-            Grid Height
-          </button>
-          <button
-            onClick={() => {
-              setDisplayArray((prev) => dropTetromino(prev, TETRONIMO_J, 0));
-            }}
-          >
-            MASh
-          </button>
-          <GridDisplay gridState={displayArray} />
-        </div>
+        {showPreviewGrid && (
+          <div style={{ width: "100%" }}>
+            <h3>Result Visualizer</h3>
+            <GridDisplay gridState={previewGrid} />
+          </div>
+        )}
       </div>
     </>
   );

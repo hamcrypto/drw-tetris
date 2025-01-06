@@ -30,4 +30,13 @@ export interface Turn {
   colOffset: number;
 }
 
-export type TurnsList = Turn[][];
+export interface TurnResult {
+  outputGrid: Grid;
+  blockHeight: number;
+}
+export interface TurnsListItem {
+  turns: Turn[];
+  result?: TurnResult;
+}
+
+export type TurnsList = TurnsListItem[];
