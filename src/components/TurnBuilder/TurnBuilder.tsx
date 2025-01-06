@@ -1,84 +1,13 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import TetronimoSelector from "../TetronimoSelector/TetronimoSelector";
-import { Grid, Tetromino, Turn, TurnsList } from "../../types";
-import GridDisplay from "../GridDisplay/GridDisplay";
-import { convertTurnToString, createGrid } from "../../utils";
-import { TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT } from "../../constants";
-import {
-  handleSubmitTurn,
-  validateFreeText,
-  positionTetronimoOnGrid,
-  processFreeText,
-} from "./utils";
+import { Turn, TurnsList } from "../../types";
+import { handleSubmitTurn, validateFreeText, processFreeText } from "./utils";
+import VisualTurnBuilder from "./VisualTurnBuilder";
 
 interface TurnBuilderProps {
   setTurnsList: Dispatch<SetStateAction<TurnsList>>;
 }
 
-const INITIAL_GRID = createGrid(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
-
 type turnBuilderInputTypes = "builder" | "text";
-
-function VisualTurnBuilder({
-  setTurnInput,
-  turnInput,
-}: {
-  setTurnInput: Dispatch<SetStateAction<Turn[]>>;
-  turnInput: Turn[];
-}) {
-  const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
-    null
-  );
-  const [turnSelectorGridPreview, setTurnSelectorGridPreview] =
-    useState<Grid>(INITIAL_GRID);
-
-  return (
-    <>
-      <TetronimoSelector
-        activeTetronimo={activeTetronimo}
-        setActiveTetronimo={setActiveTetronimo}
-      />
-      <GridDisplay
-        gridState={turnSelectorGridPreview}
-        gridOptions={{
-          blockOptions: {
-            onMouseOver: (_event, block) => {
-              if (activeTetronimo)
-                positionTetronimoOnGrid(
-                  activeTetronimo,
-                  block.xCord,
-                  setTurnSelectorGridPreview
-                );
-            },
-            onClick: (_event, block) => {
-              if (activeTetronimo) {
-                setTurnInput((prevInput) => [
-                  ...prevInput,
-                  {
-                    tetronimo: activeTetronimo,
-                    colOffset: block.xCord,
-                  },
-                ]);
-                setActiveTetronimo(null);
-                setTurnSelectorGridPreview(INITIAL_GRID);
-              }
-            },
-          },
-        }}
-        style={{
-          cursor: "pointer",
-        }}
-      />
-      <input
-        type="text"
-        disabled
-        placeholder={"Select a Tetromino then place it in the grid above"}
-        style={{ width: "100%", fontSize: 15 }}
-        value={convertTurnToString(turnInput)}
-      />
-    </>
-  );
-}
 
 function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
   const [turnInput, setTurnInput] = useState<Turn[]>([]);
