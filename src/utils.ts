@@ -58,12 +58,10 @@ export function mergeBlockArrays(
   for (let i = 0; i < maxRows; i++) {
     mergedGrid[i] = [];
     for (let j = 0; j < maxCols; j++) {
-      mergedGrid[i][j] = {
-        color: "White",
-        filled: false,
+      mergedGrid[i][j] = blockBuilder({
         xCord: j,
         yCord: i,
-      };
+      });
     }
   }
 
@@ -107,43 +105,6 @@ export function mergeBlockArrays(
   return mergedGrid;
 }
 
-// Taken from https://github.com/martinstark/throttle-ts/blob/main/src/index.ts
-export const throttle = <R, A extends unknown[]>(
-  fn: (...args: A) => R,
-  delay: number
-): [(...args: A) => R | undefined, () => void, () => void] => {
-  let wait = false;
-  let timeout: undefined | number;
-  let cancelled = false;
-
-  function resetWait() {
-    wait = false;
-  }
-
-  return [
-    (...args: A) => {
-      if (cancelled) return undefined;
-      if (wait) return undefined;
-
-      const val = fn(...args);
-
-      wait = true;
-
-      timeout = window.setTimeout(resetWait, delay);
-
-      return val;
-    },
-    () => {
-      cancelled = true;
-      clearTimeout(timeout);
-    },
-    () => {
-      clearTimeout(timeout);
-      resetWait();
-    },
-  ];
-};
-
 export const convertTurnToString = (turns: Turn[]) =>
   turns
     .map(
@@ -159,8 +120,6 @@ export const dropTetromino = (
   const initialGridHeight = grid?.length;
   const gridWidth = grid[0]?.length;
 
-  const headspace = getGridHeight(grid) - initialGridHeight;
-  console.log({ maxHeight: getGridHeight(grid), initialGridHeight, headspace });
   if (initialGridHeight - getGridHeight(grid) < 4) {
     grid = addEmptyRowsToTop(grid, 5);
   }
@@ -168,66 +127,11 @@ export const dropTetromino = (
   const tetrominoHeight = tetromino.coordinates.length;
   const tetrominoWidth = tetromino.coordinates[0].length;
 
-  // 1. Check if adding rows is necessary
-  const addRowsNeeded = false;
-  // for (let tRow = 0; tRow < tetrominoHeight; tRow++) {
-  //   for (let tCol = 0; tCol < tetrominoWidth; tCol++) {
-  //     if (tetromino.coordinates[tRow][tCol] === 1) {
-  //       const gridRow = -tetrominoHeight + tRow; // Check for placement above the grid
-  //       if (gridRow < 0) {
-  //         addRowsNeeded = true;
-  //         break;
-  //       }
-  //     }
-  //   }
-  //   if (addRowsNeeded) break;
-  // }
-
   // 2. Calculate rows needed and starting position
-  let rowsNeeded = 0;
-  let startRow = 0; // Where to start placing the tetromino (may be negative if adding rows)
-  if (addRowsNeeded) {
-    for (let row = 0; row < tetrominoHeight; row++) {
-      let canPlace = true;
-      for (let tRow = 0; tRow < tetrominoHeight; tRow++) {
-        for (let tCol = 0; tCol < tetrominoWidth; tCol++) {
-          if (tetromino.coordinates[tRow][tCol] === 1) {
-            const gridRow = row - tetrominoHeight + tRow; // Check for placement above the grid
-            if (gridRow >= 0) {
-              canPlace = false;
-            }
-          }
-        }
-        if (!canPlace) break;
-      }
-
-      if (canPlace) {
-        rowsNeeded = tetrominoHeight - row;
-        startRow = row - tetrominoHeight; // Negative value indicates adding rows
-        break;
-      }
-    }
-  }
+  const startRow = 0; // Where to start placing the tetromino (may be negative if adding rows)
 
   // 3. Create new grid (add rows if needed)
-  let newGrid: Grid = [];
-  if (addRowsNeeded) {
-    for (let i = 0; i < rowsNeeded; i++) {
-      newGrid.push(
-        Array.from({ length: gridWidth }, (_, j) => ({
-          color: BlockColors.WHITE,
-          filled: false,
-          xCord: j,
-          yCord: i,
-        }))
-      );
-    }
-    newGrid = newGrid.concat(
-      grid.map((row) => row.map((block) => ({ ...block })))
-    );
-  } else {
-    newGrid = grid.map((row) => row.map((block) => ({ ...block })));
-  }
+  const newGrid = grid.map((row) => row.map((block) => ({ ...block })));
 
   // 4. Update y-coordinates in the new grid
   for (let y = 0; y < newGrid.length; y++) {
@@ -299,7 +203,7 @@ export const dropTetromino = (
   for (let y = gridHeight - 1; y >= 0; y--) {
     const isRowFull = newGrid[y].every((block) => block.filled);
     if (isRowFull) {
-      newGrid.splice(y, 1); // Remove the row
+      newGrid.splice(y, 1);
       rowsCleared++;
     }
   }
@@ -307,12 +211,12 @@ export const dropTetromino = (
   // 8. Add new empty rows at the top if any were cleared
   for (let i = 0; i < rowsCleared; i++) {
     newGrid.unshift(
-      Array.from({ length: gridWidth }, (_, j) => ({
-        color: BlockColors.WHITE, // Or your desired empty color
-        filled: false,
-        xCord: j,
-        yCord: i,
-      }))
+      Array.from({ length: gridWidth }, (_, j) =>
+        blockBuilder({
+          xCord: j,
+          yCord: i,
+        })
+      )
     );
   }
 
@@ -345,12 +249,12 @@ export const addEmptyRowsToTop = (grid: Grid, numRowsToAdd: number): Grid => {
   // Create new empty rows
   for (let i = 0; i < numRowsToAdd; i++) {
     newGrid.push(
-      Array.from({ length: gridWidth }, (_, j) => ({
-        color: BlockColors.WHITE, // Or your desired empty color
-        filled: false,
-        xCord: j,
-        yCord: i, // Initial y-coordinate will be updated later
-      }))
+      Array.from({ length: gridWidth }, (_, j) =>
+        blockBuilder({
+          xCord: j,
+          yCord: i,
+        })
+      )
     );
   }
 
