@@ -17,6 +17,7 @@ function VisualTurnBuilder({
   const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
     null
   );
+  const [selectedOffset, setSelectedOffset] = useState<number | null>(null);
   const [turnSelectorGridPreview, setTurnSelectorGridPreview] =
     useState<Grid>(INITIAL_GRID);
 
@@ -35,16 +36,17 @@ function VisualTurnBuilder({
                 positionTetronimoOnGrid(
                   activeTetronimo,
                   block.xCord,
-                  setTurnSelectorGridPreview
+                  setTurnSelectorGridPreview,
+                  setSelectedOffset
                 );
             },
-            onClick: (_event, block) => {
-              if (activeTetronimo) {
+            onClick: () => {
+              if (activeTetronimo && selectedOffset) {
                 setTurnInput((prevInput) => [
                   ...prevInput,
                   {
                     tetronimo: activeTetronimo,
-                    colOffset: block.xCord,
+                    colOffset: selectedOffset,
                   },
                 ]);
                 setActiveTetronimo(null);

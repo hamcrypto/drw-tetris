@@ -59,7 +59,8 @@ export const processFreeText = (
 export const positionTetronimoOnGrid = (
   tetronimo: Tetromino,
   xCord: number,
-  setTurnSelectorGridPreview: Dispatch<SetStateAction<Grid>>
+  setTurnSelectorGridPreview: Dispatch<SetStateAction<Grid>>,
+  setSelectedOffset: Dispatch<SetStateAction<number | null>>
 ) => {
   const tetronimoConvertedToGrid = createGrid(
     TETRONIMO_ROW_COUNT,
@@ -78,6 +79,7 @@ export const positionTetronimoOnGrid = (
 
   if (updatedGrid !== false) {
     setTurnSelectorGridPreview(updatedGrid);
+    setSelectedOffset(xCord);
   }
   return updatedGrid;
 };

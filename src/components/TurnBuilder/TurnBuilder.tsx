@@ -51,6 +51,7 @@ function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
             handleSubmitTurn(turnInput, setTurnsList, setTurnInput);
           } else {
             processFreeText(freeTextInput, setTurnsList);
+            setFreeTextInput("");
           }
         }}
       >
