@@ -5,7 +5,7 @@ import {
   TETRONIMOS,
 } from "../../constants";
 import { Tetromino } from "../../types";
-import { gridBuilder } from "../../utils";
+import { createGrid } from "../../utils";
 import GridDisplay from "../GridDisplay/GridDisplay";
 
 interface TetronimoPieceHolderProps {
@@ -19,7 +19,7 @@ function TetronimoPieceHolder({
   setActiveTetronimo,
   isSelected,
 }: TetronimoPieceHolderProps) {
-  const gridState = gridBuilder(
+  const gridState = createGrid(
     TETRONIMO_ROW_COUNT,
     TETRONIMO_COL_COUNT,
     tetronimo

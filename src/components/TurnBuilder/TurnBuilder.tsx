@@ -2,11 +2,7 @@ import { Dispatch, FormEvent, SetStateAction, useState } from "react";
 import TetronimoSelector from "../TetronimoSelector/TetronimoSelector";
 import { Grid, TurnsListItem, Tetromino, Turn, TurnsList } from "../../types";
 import GridDisplay from "../GridDisplay/GridDisplay";
-import {
-  convertTurnToString,
-  gridBuilder,
-  mergeBlockArrays,
-} from "../../utils";
+import { convertTurnToString, createGrid, mergeGrids } from "../../utils";
 import {
   TETRIS_COL_COUNT,
   TETRONIMO_COL_COUNT,
@@ -18,7 +14,7 @@ interface TurnBuilderProps {
   setTurnsList: Dispatch<SetStateAction<TurnsList>>;
 }
 
-const INITIAL_GRID = gridBuilder(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
+const INITIAL_GRID = createGrid(TETRIS_COL_COUNT, TETRONIMO_ROW_COUNT);
 
 function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
   const [activeTetronimo, setActiveTetronimo] = useState<Tetromino | null>(
@@ -43,17 +39,16 @@ function TurnBuilder({ setTurnsList }: TurnBuilderProps) {
     useState<Grid>(INITIAL_GRID);
 
   const positionNewTetronimo = (tetronimo: Tetromino, xCord: number) => {
-    const tetronimoConvertedToGrid = gridBuilder(
+    const tetronimoConvertedToGrid = createGrid(
       TETRONIMO_ROW_COUNT,
       TETRONIMO_COL_COUNT,
       tetronimo
     );
 
-    const updatedGrid = mergeBlockArrays(
-      INITIAL_GRID,
-      tetronimoConvertedToGrid,
-      { colOffset: xCord, rowOffset: 0 }
-    );
+    const updatedGrid = mergeGrids(INITIAL_GRID, tetronimoConvertedToGrid, {
+      colOffset: xCord,
+      rowOffset: 0,
+    });
 
     if (updatedGrid !== false) {
       setTurnSelectorGridPreview(updatedGrid);

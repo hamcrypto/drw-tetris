@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import GridDisplay from "./components/GridDisplay/GridDisplay";
 import TurnBuilder from "./components/TurnBuilder/TurnBuilder";
-import { dropTetromino, getGridHeight, gridBuilder } from "./utils";
+import { dropTetromino, getFilledHeight, createGrid } from "./utils";
 import { TETRIS_COL_COUNT, TETRIS_ROW_COUNT } from "./constants";
 import TurnsListTable from "./components/TurnsListTable/TurnsListTable";
 import { TurnsListItem, TurnResult, TurnsList } from "./types";
@@ -28,17 +28,17 @@ import { TurnsListItem, TurnResult, TurnsList } from "./types";
   */
 function App() {
   const [previewGrid, setPreviewGrid] = useState(
-    gridBuilder(TETRIS_COL_COUNT, TETRIS_ROW_COUNT)
+    createGrid(TETRIS_COL_COUNT, TETRIS_ROW_COUNT)
   );
   const [showPreviewGrid, setShowPreviewGrid] = useState(false);
   const [turnsList, setTurnsList] = useState<TurnsList>([]);
 
   const playTurn = (turnToPlay: TurnsListItem): TurnResult => {
-    let outputGrid = [...previewGrid];
+    let outputGrid = createGrid(TETRIS_COL_COUNT, TETRIS_ROW_COUNT);
     turnToPlay.turns.forEach(({ tetronimo, colOffset }) => {
       outputGrid = dropTetromino(outputGrid, tetronimo, colOffset);
     });
-    const blockHeight = getGridHeight(outputGrid);
+    const blockHeight = getFilledHeight(outputGrid);
     return { outputGrid, blockHeight };
   };
 

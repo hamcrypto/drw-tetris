@@ -1,39 +1,42 @@
 import { Block, BlockColors, Grid, Tetromino, Turn } from "./types";
 
-const blockBuilder = ({
+// Helper function to create a block
+const createBlock = ({
   color = "White" as BlockColors,
   filled = false,
   xCord = 0,
   yCord = 0,
-}) => {
-  const newBlock: Block = { color, filled, xCord, yCord };
-  return newBlock;
-};
+}: {
+  color?: BlockColors;
+  filled?: boolean;
+  xCord?: number;
+  yCord?: number;
+}): Block => ({ color, filled, xCord, yCord });
 
-export const gridBuilder = (
+// Function to create a grid
+export const createGrid = (
   columnCount: number,
   rowCount: number,
-  input?: Tetromino
-) => {
-  const blockGrid: Grid = [];
+  tetromino?: Tetromino
+): Grid => {
+  const grid: Grid = [];
 
-  // Input is a tetronimo
-  for (let currentRow = 0; currentRow < rowCount; currentRow++) {
-    blockGrid[currentRow] = [];
-    for (let currentCol = 0; currentCol < columnCount; currentCol++) {
-      const filled = Boolean(input?.coordinates[currentRow][currentCol]);
-      const color = filled ? input?.color : undefined;
+  for (let row = 0; row < rowCount; row++) {
+    grid[row] = [];
+    for (let col = 0; col < columnCount; col++) {
+      const isFilled = Boolean(tetromino?.coordinates[row][col]);
+      const blockColor = isFilled ? tetromino?.color : undefined;
 
-      blockGrid[currentRow][currentCol] = blockBuilder({
-        xCord: currentCol,
-        yCord: currentRow,
-        filled,
-        color: color,
+      grid[row][col] = createBlock({
+        xCord: col,
+        yCord: row,
+        filled: isFilled,
+        color: blockColor,
       });
     }
   }
 
-  return blockGrid;
+  return grid;
 };
 
 interface Offset {
@@ -41,7 +44,8 @@ interface Offset {
   colOffset: number;
 }
 
-export function mergeBlockArrays(
+// Function to merge two grids
+export function mergeGrids(
   grid1: Grid,
   grid2: Grid,
   offset?: Offset
@@ -54,24 +58,16 @@ export function mergeBlockArrays(
   );
   const maxCols = MAX_GRID_WIDTH;
 
-  const mergedGrid: Grid = [];
-  for (let i = 0; i < maxRows; i++) {
-    mergedGrid[i] = [];
-    for (let j = 0; j < maxCols; j++) {
-      mergedGrid[i][j] = blockBuilder({
-        xCord: j,
-        yCord: i,
-      });
-    }
-  }
+  const mergedGrid: Grid = createEmptyGrid(maxRows, maxCols);
 
+  // Helper function to copy blocks from a source grid to the merged grid
   const copyBlocks = (sourceGrid: Grid, isGrid2: boolean = false) => {
-    for (let i = 0; i < sourceGrid.length; i++) {
-      for (let j = 0; j < sourceGrid[i].length; j++) {
-        const sourceBlock = sourceGrid[i][j];
+    for (let row = 0; row < sourceGrid.length; row++) {
+      for (let col = 0; col < sourceGrid[row].length; col++) {
+        const sourceBlock = sourceGrid[row][col];
 
-        const targetRow = isGrid2 && offset ? i + offset.rowOffset : i;
-        const targetCol = isGrid2 && offset ? j + offset.colOffset : j;
+        const targetRow = isGrid2 && offset ? row + offset.rowOffset : row;
+        const targetCol = isGrid2 && offset ? col + offset.colOffset : col;
 
         if (
           targetRow >= 0 &&
@@ -83,35 +79,79 @@ export function mergeBlockArrays(
 
           if (sourceBlock.filled) {
             if (targetBlock.filled) {
-              return false;
+              return false; // Collision detected
             } else {
               targetBlock.filled = true;
               targetBlock.color = sourceBlock.color;
             }
           }
         } else if (sourceBlock.filled) {
-          // Only return an error if a 'filled' block goes out of bounds
-          return false;
+          return false; // Block goes out of bounds
         }
       }
     }
     return true;
   };
 
+  // Copy blocks from both grids
   if (!copyBlocks(grid1) || !copyBlocks(grid2, true)) {
-    return false;
+    return false; // Error during merging
   }
 
   return mergedGrid;
 }
 
-export const convertTurnToString = (turns: Turn[]) =>
-  turns
-    .map(
-      (currentTurn) => `${currentTurn.tetronimo.name}${currentTurn.colOffset}`
-    )
-    .join(",");
+// Function to convert an array of turns to a string
+export const convertTurnToString = (turns: Turn[]): string =>
+  turns.map((turn) => `${turn.tetronimo.name}${turn.colOffset}`).join(",");
 
+// Function to get the height of filled blocks in a grid
+export const getFilledHeight = (grid: Grid): number => {
+  const gridHeight = grid.length;
+
+  for (let row = 0; row < gridHeight; row++) {
+    if (grid[row].some((block) => block.filled)) {
+      return gridHeight - row;
+    }
+  }
+
+  return 0;
+};
+
+// Function to create an empty grid of a given size
+const createEmptyGrid = (rows: number, cols: number): Grid => {
+  const grid: Grid = [];
+  for (let row = 0; row < rows; row++) {
+    grid[row] = [];
+    for (let col = 0; col < cols; col++) {
+      grid[row][col] = createBlock({ xCord: col, yCord: row });
+    }
+  }
+  return grid;
+};
+
+// Function to add empty rows to the top of a grid
+export const addEmptyRows = (grid: Grid, numRows: number): Grid => {
+  const gridWidth = grid[0].length;
+  const newGrid = createEmptyGrid(numRows, gridWidth);
+
+  newGrid.push(...grid);
+
+  updateBlockYCoordinates(newGrid);
+
+  return newGrid;
+};
+
+// Helper function to update the y-coordinates of blocks in a grid
+const updateBlockYCoordinates = (grid: Grid) => {
+  for (let row = 0; row < grid.length; row++) {
+    for (let col = 0; col < grid[row].length; col++) {
+      grid[row][col].yCord = row;
+    }
+  }
+};
+
+// Function to drop a tetromino onto a grid
 export const dropTetromino = (
   grid: Grid,
   tetromino: Tetromino,
@@ -119,31 +159,24 @@ export const dropTetromino = (
 ): Grid => {
   const initialGridHeight = grid?.length;
   const gridWidth = grid[0]?.length;
+  let newGrid = [...grid];
 
-  if (initialGridHeight - getGridHeight(grid) < 4) {
-    grid = addEmptyRowsToTop(grid, 5);
+  if (initialGridHeight - getFilledHeight(grid) < 4) {
+    newGrid = addEmptyRows(grid, 5);
   }
 
   const tetrominoHeight = tetromino.coordinates.length;
   const tetrominoWidth = tetromino.coordinates[0].length;
 
-  // 2. Calculate rows needed and starting position
-  const startRow = 0; // Where to start placing the tetromino (may be negative if adding rows)
+  // Create a copy of the grid to avoid modifying the original
+  newGrid = newGrid.map((row) => row.map((block) => ({ ...block })));
 
-  // 3. Create new grid (add rows if needed)
-  const newGrid = grid.map((row) => row.map((block) => ({ ...block })));
+  updateBlockYCoordinates(newGrid);
 
-  // 4. Update y-coordinates in the new grid
-  for (let y = 0; y < newGrid.length; y++) {
-    for (let x = 0; x < newGrid[y].length; x++) {
-      newGrid[y][x].yCord = y;
-    }
-  }
-
-  // 5. Find the lowest possible position in the new grid
+  // Find the lowest possible position to place the tetromino
   const gridHeight = newGrid.length;
-  let rowOffset = Math.max(0, -startRow);
-  for (let row = rowOffset; row < gridHeight; row++) {
+  let rowOffset = 0;
+  for (let row = 0; row < gridHeight; row++) {
     let canPlace = true;
     for (let tRow = 0; tRow < tetrominoHeight; tRow++) {
       for (let tCol = 0; tCol < tetrominoWidth; tCol++) {
@@ -151,13 +184,11 @@ export const dropTetromino = (
           const gridRow = row + tRow;
           const gridCol = colOffset + tCol;
 
-          // Check for out of bounds
           if (gridCol < 0 || gridCol >= gridWidth) {
             canPlace = false;
             break;
           }
 
-          // Check for collision
           if (gridRow >= gridHeight || newGrid[gridRow][gridCol].filled) {
             canPlace = false;
             break;
@@ -175,7 +206,7 @@ export const dropTetromino = (
     }
   }
 
-  // 6. Place the tetromino
+  // Place the tetromino on the grid
   for (let tRow = 0; tRow < tetrominoHeight; tRow++) {
     for (let tCol = 0; tCol < tetrominoWidth; tCol++) {
       if (tetromino.coordinates[tRow][tCol] === 1) {
@@ -187,86 +218,38 @@ export const dropTetromino = (
           gridCol >= 0 &&
           gridCol < gridWidth
         ) {
-          newGrid[gridRow][gridCol] = {
+          newGrid[gridRow][gridCol] = createBlock({
             color: tetromino.color,
             filled: true,
             xCord: gridCol,
             yCord: gridRow,
-          };
+          });
         }
       }
     }
   }
 
-  // 7. Clear full rows
+  // Clear any full rows
   let rowsCleared = 0;
-  for (let y = gridHeight - 1; y >= 0; y--) {
-    const isRowFull = newGrid[y].every((block) => block.filled);
+  for (let row = gridHeight - 1; row >= 0; row--) {
+    const isRowFull = newGrid[row].every((block) => block.filled);
     if (isRowFull) {
-      newGrid.splice(y, 1);
+      newGrid.splice(row, 1);
       rowsCleared++;
     }
   }
 
-  // 8. Add new empty rows at the top if any were cleared
-  for (let i = 0; i < rowsCleared; i++) {
+  // Add new empty rows if any were cleared
+  if (rowsCleared > 0) {
     newGrid.unshift(
-      Array.from({ length: gridWidth }, (_, j) =>
-        blockBuilder({
-          xCord: j,
-          yCord: i,
-        })
-      )
+      ...createEmptyGrid(rowsCleared, gridWidth).map((row, index) => {
+        row.forEach((block) => (block.yCord = index));
+        return row;
+      })
     );
   }
 
-  // 9. Update y-coordinates after clearing rows
-  for (let y = 0; y < newGrid.length; y++) {
-    for (let x = 0; x < newGrid[y].length; x++) {
-      newGrid[y][x].yCord = y;
-    }
-  }
-
-  return newGrid;
-};
-
-export const getGridHeight = (grid: Grid): number => {
-  const gridHeight = grid.length;
-
-  for (let y = 0; y < gridHeight; y++) {
-    if (grid[y].some((block) => block.filled)) {
-      return gridHeight - y;
-    }
-  }
-
-  return 0;
-};
-
-export const addEmptyRowsToTop = (grid: Grid, numRowsToAdd: number): Grid => {
-  const gridWidth = grid[0].length;
-  const newGrid: Grid = [];
-
-  // Create new empty rows
-  for (let i = 0; i < numRowsToAdd; i++) {
-    newGrid.push(
-      Array.from({ length: gridWidth }, (_, j) =>
-        blockBuilder({
-          xCord: j,
-          yCord: i,
-        })
-      )
-    );
-  }
-
-  // Add the existing rows below the new rows
-  newGrid.push(...grid);
-
-  // Update y-coordinates of all rows
-  for (let y = 0; y < newGrid.length; y++) {
-    for (let x = 0; x < newGrid[y].length; x++) {
-      newGrid[y][x].yCord = y;
-    }
-  }
+  updateBlockYCoordinates(newGrid);
 
   return newGrid;
 };
