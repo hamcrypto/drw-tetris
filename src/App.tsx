@@ -73,7 +73,7 @@ function App() {
             <button onClick={resetTurnsList} disabled={!turnsList.length}>
               Reset turns list
             </button>
-            <button onClick={playAllUnplayedTurns}>Play all turns</button>
+            <button onClick={playAllUnplayedTurns}>Play unplayed turns</button>
           </div>
         </div>
         {showPreviewGrid && (
